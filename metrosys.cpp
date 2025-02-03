@@ -739,7 +739,7 @@ void metromap()
     cout << "           ^\n";
     cout << "           |\n";
     cout << "           v\n";
-    cout << "        Mandi House <-> Barakhamba <-> Rajiv Chowk <-> Karol Bagh <-> Patel Nagar.\n";
+    cout << "        Mandi   House <-> Barakhamba <-> Rajiv   Chowk <-> Karol Bagh <-> Patel Nagar.\n";
     cout << "              ^                             ^\n";
     cout << "              |                             |\n";
     cout << "              v                             v\n";
