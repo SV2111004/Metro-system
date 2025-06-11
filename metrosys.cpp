@@ -1,24 +1,29 @@
-#include<iostream>
-#include<vector>
-#include<string>
-#include<queue>
-#include<unordered_map>
+#include <iostream>
+#include <vector>
+#include <string>
+#include <queue>
+#include <unordered_map>
+#include <climits>
 #include <limits>
 #include <algorithm>
-#include<cctype>
+#include <cctype>
 #include <stdlib.h>
 #include <windows.h>
 #include <time.h>
 #include <fstream>
 #include <cstdio>
 #include <conio.h>
+#include <map>
 
-
+const int INF = INT_MAX;
+const int N = 25; // Number of stations
 
 using namespace std;
 class metrostation;
 
-void menu(vector<metrostation> station);
+void mainMenu(vector<metrostation> station);
+void userMenu(vector<metrostation> station);
+void staffMenu(vector<metrostation> station);
 
 string getHiddenPassword() {
     string password = "";
@@ -105,8 +110,12 @@ class metrostation
     }
     bool hasparking() const {
         return hasParking;
+
     }
-    string findNearestStationWithParking(const string& startID, vector<metrostation>& stations) {
+    int getDegree() const {
+        return neighbors.size();}
+
+string findNearestStationWithParking(const string& startID, vector<metrostation>& stations) {
         // Create a map to relate station IDs to their indices
         unordered_map<string, int> stationIndexMap;
         for (int i = 0; i < stations.size(); i++) {
@@ -148,7 +157,8 @@ class metrostation
         return "No nearby station with parking found";  // If no station with parking is found
     }
 
-    string findNearestStationWithWashroom(const string& startID, vector<metrostation>&station) {
+
+string findNearestStationWithWashroom(const string& startID, vector<metrostation>&station) {
         // Create a map to relate station IDs to their indices
         unordered_map<string, int> stationIndexMap;
         for (int i = 0; i < station.size(); i++) {
@@ -191,7 +201,8 @@ class metrostation
 
     }
 
-  int stationcheck(vector<metrostation>station, string search_Id)
+
+int stationcheck(vector<metrostation>station, string search_Id)
   {
     for (int i = 0; i < station.size(); i++) {
         if (station[i].station_id == search_Id) {
@@ -201,7 +212,8 @@ class metrostation
     return -1;
   }
 
-  void displaystation(vector<metrostation>station)
+
+void displaystation(vector<metrostation>station)
       {
         system("color f4");
             gotoxy(26, 4);
@@ -217,7 +229,7 @@ class metrostation
         cout << "------------------------------------\n\n";
       }
 
-    void stationinfo(vector<metrostation>station,string sid)
+void stationinfo(vector<metrostation>station,string sid)
     {
         for(int i=0;i<station.size();i++)
         {
@@ -250,7 +262,7 @@ class metrostation
         cout<<"Press any key to go back to menu()........";
         getch();
         system("cls");
-        menu(station);
+        userMenu(station);
         return;
             }
         }
@@ -419,7 +431,7 @@ void Card::recharge_card(double amount) {
 
     // Display header
     gotoxy(44, 11);
-    cout << "** CARD RECHARGE SUCCESSFUL **";
+    cout << "* CARD RECHARGE SUCCESSFUL *";
 
     gotoxy(44, 13);
     cout << "Amount Added: " << amount;
@@ -435,7 +447,7 @@ void Card::recharge_card(double amount) {
     cout << "Press any key to go back to menu()........";
     getch();
     system("cls");
-    menu(station);
+    userMenu(station);
 }
 
 void Card::pay_fare(double fare) {
@@ -458,7 +470,7 @@ void Card::pay_fare(double fare) {
 
     // Display header
     gotoxy(44, 11);
-    cout << "** FARE PAYMENT **";
+    cout << "* FARE PAYMENT *";
 
     if (fare > balance) {
         // Insufficient balance message
@@ -487,7 +499,7 @@ void Card::pay_fare(double fare) {
     // Await user input and return to the menu
     getch();
     system("cls");
-    menu(station);
+    userMenu(station);
 }
 
 
@@ -509,7 +521,7 @@ void Card::display_card_info() {
 
 
     gotoxy(44, 11);
-    cout << "** CARD INFORMATION **";
+    cout << "* CARD INFORMATION *";
 
 
     gotoxy(44, 13);
@@ -528,7 +540,7 @@ void Card::display_card_info() {
 
     getch();
     system("cls");
-    menu(station);
+    userMenu(station);
 }
 
 
@@ -566,8 +578,138 @@ Card get_card_by_index(int index) {
     return Card("", 0.0); // Return an empty card if not found
 }
 
+// Function to handle staff login
+int staffLogin() {
+    string username, enteredUsername, password, enteredPassword;
+    bool isLoggedIn = false;
 
-int login() {
+    system("cls");
+    system("color f4");
+
+    gotoxy(0, 2);
+    design(130, 170);
+    gotoxy(55, 4);
+    cout << "WELCOME TO STAFF LOGIN";
+    gotoxy(0, 6);
+    design(130, 170);
+    Sleep(1000);
+
+    gotoxy(44, 9);
+    cout << "Enter your USERNAME: ";
+    cin >> enteredUsername;
+
+    gotoxy(44, 11);
+    cout << "Enter your PASSWORD: ";
+    enteredPassword = getHiddenPassword();
+
+    // Open file to read staff credentials
+    ifstream file("staff_logins.txt");
+    if (!file.is_open()) {
+        gotoxy(44, 13);
+        cout << "Error opening 'staff_logins.txt'. Make sure the file exists.";
+        return -1;
+    }
+
+    // Check if credentials match
+    while (file >> username >> password) {
+        if (username == enteredUsername && password == enteredPassword) {
+            gotoxy(67, 15);
+            cout << "Logging you in, please wait";
+            for (int i = 0; i < 6; i++) {
+                cout << ".";
+                Sleep(500);
+            }
+
+            system("CLS");
+            staffMenu(station); // assuming station is globally accessible
+            isLoggedIn = true;
+            break;
+        }
+    }
+
+    file.close();
+
+    if (!isLoggedIn) {
+        cout << "\n\t\t\tIncorrect username or password!\n";
+        system("pause");
+        staffLogin(); // Retry login
+    }
+
+    return isLoggedIn;
+}
+
+
+// Function to handle staff signup
+void staffSignup() {
+  string newUsername, newPassword, confirmPassword;
+  bool usernameExists;
+  system("color f4");
+  gotoxy(0, 2);
+  design(130, 170);
+  gotoxy(55, 4);
+  cout << "WELCOME TO STAFF SIGNUP" << endl;
+  gotoxy(0, 6);
+  design(130, 170);
+
+  do {
+      usernameExists = false;
+      gotoxy(44, 9);
+      cout << "Enter a USERNAME: ";
+      cin >> newUsername;
+
+      // Check if the username already exists
+      ifstream fileIn("staff_logins.txt");
+      if (fileIn.is_open()) {
+          string username, password;
+          while (fileIn >> username >> password) {
+              if (username == newUsername) {
+                  usernameExists = true;
+                  cout << "\n\t\t\tSorry, this USERNAME already exists!" << endl;
+                  break;
+              }
+          }
+          fileIn.close(); // Close the input file
+      }
+
+  } while (usernameExists); // Keep asking for a unique username
+
+  // Ask for password and confirmation
+  gotoxy(44, 11);
+  cout << "Enter your PASSWORD: ";
+  newPassword = getHiddenPassword();
+  gotoxy(44, 12);
+  cout << "Re-enter your PASSWORD: ";
+  confirmPassword = getHiddenPassword();
+
+  while (newPassword != confirmPassword) {
+      cout << "\n\t\t\tPasswords do not match! Please try again.\n";
+      cout << "Enter your PASSWORD: ";
+      newPassword = getHiddenPassword();
+      cout << "Re-enter your PASSWORD: ";
+      confirmPassword = getHiddenPassword();
+  }
+
+  // Save the new staff credentials to the file
+  ofstream fileOut("staff_logins.txt", ios::app); // Appending new data
+  if (!fileOut.is_open()) {
+      cout << "\nError opening file for writing!\n";
+      return;
+  }
+  fileOut << newUsername << " " << newPassword << endl; // Writing to the file
+  fileOut.close();
+
+  // Simulate account creation with a delay
+  cout << "\n\t\t\tCreating your new account";
+  for (int i = 0; i < 6; i++) {
+      cout << ".";
+      Sleep(500);
+  }
+  cout << "\n\n\t\t\tCongratulations! Your account has been created successfully!\n";
+  Sleep(1000);
+  system("CLS");
+}
+
+int userLogin() {
     string username, enteredUsername, password, enteredPassword;
     bool isLoggedIn = false;
     system("cls");
@@ -605,7 +747,7 @@ int login() {
         }
 
             system("CLS");
-            menu(station);
+            userMenu(station);
             isLoggedIn = true;
 
             break;
@@ -615,13 +757,17 @@ int login() {
 
     if (!isLoggedIn) {
         cout << "\n\t\t\tIncorrect username or password!\n";
+
+        system("pause");
+        userLogin();
     }
 
     return isLoggedIn;
 }
 
 // Function to handle user signup
-void signup() {
+void userSignup() {
+    system("cls");
     string newUsername, newPassword, confirmPassword;
     bool usernameExists;
     system("color f4");
@@ -639,21 +785,30 @@ void signup() {
         cout << "Enter a USERNAME: ";
         cin >> newUsername;
 
-        // Check if the username already exists
+        // Clear any previous message
+        gotoxy(44, 10);
+        cout << "                                          ";
+
+        // Check for existing usernames
         ifstream fileIn("user_logins.txt");
         if (fileIn.is_open()) {
             string username, password;
             while (fileIn >> username >> password) {
                 if (username == newUsername) {
                     usernameExists = true;
-                    cout << "\n\t\t\tSorry, this USERNAME already exists!" << endl;
+                    gotoxy(44, 10);
+                    cout << "Username already exists! Try again.";
+                    Sleep(1500);
+                    gotoxy(44, 9);
+                    cout << "                                          "; // clear line
                     break;
                 }
             }
-            fileIn.close(); // Close the input file
+            fileIn.close();
         }
+    } while (usernameExists);
 
-    } while (usernameExists); // Keep asking for a unique username
+
 
     // Ask for password and confirmation
     gotoxy(44, 11);
@@ -690,6 +845,8 @@ void signup() {
     Sleep(1000);
     system("CLS");
 }
+
+
 class Stack {
 private:
     vector<string> stackData; // Vector to store stack data
@@ -722,11 +879,11 @@ public:
 void metromap()
 {   system("cls");
     system("color 8f");
-    gotoxy(44,2);
+    gotoxy(44,1);
     cout << "====================================";
-    gotoxy(44,3);
+    gotoxy(44,2);
     cout << "         METRO STATION MAP\n";
-    gotoxy(44,4);
+    gotoxy(44,3);
     cout << "====================================";
     cout<<endl;
 
@@ -739,7 +896,7 @@ void metromap()
     cout << "           ^\n";
     cout << "           |\n";
     cout << "           v\n";
-    cout << "        Mandi   House <-> Barakhamba <-> Rajiv   Chowk <-> Karol Bagh <-> Patel Nagar.\n";
+    cout << "        Mandi House <-> Barakhamba <-> Rajiv Chowk <-> Karol Bagh <-> Patel Nagar.\n";
     cout << "              ^                             ^\n";
     cout << "              |                             |\n";
     cout << "              v                             v\n";
@@ -756,13 +913,12 @@ void metromap()
     cout << "             |                 /\n";
     cout << "             v                v\n";
     cout << "         Lal Quila <-> Kashmere Gate <-> Civil Lines <-> GTB Nagar\n";
-    cout<<endl;
-    design(130,177);
-    gotoxy(55,30);
+    cout<<endl<<endl;
+    gotoxy(60,40);
     cout<<"Press any key to go back to menu()........";
     getch();
     system("cls");
-    menu(station);
+    userMenu(station);
 
 }
 // Function to perform DFS and find all paths
@@ -887,164 +1043,456 @@ void preparelist(vector<metrostation> &stations)
 
 }
 
-void menu(vector<metrostation>station)
-{
-     static Stack stationStack;
-     static string currentStation = "";  // To keep track of the current station
-    system("cls");
-    gotoxy(44, 10);
-    cout<<"[1]. Show Metro Map ";
-    gotoxy(44, 11);
-    cout<<"[2]. Show station details";
-    gotoxy(44, 12);
-    cout<<"[3]. Display Card Info\n";
-    gotoxy(44, 13);
-    cout<<"[4]. Recharge Card\n";
-    gotoxy(44, 14);
-    cout<<"[5]. Pay Fare\n";
-    gotoxy(44, 15);
-    cout<<"[6] .Go back to previous station\n";
-    gotoxy(44,16);
-   cout<<"[7] .Find nearest station with washroom\n";
-    gotoxy(44,17);
-    cout<<"[8] .Find nearest station with Parking\n";
-    gotoxy(44,18);
-    cout<<"[9] .Find all paths between source and destination";
-    gotoxy(44, 19);
-    cout<<"[10] .Find the shortest distance between source and destination";
-    gotoxy(44, 20);
-    cout<<"[11] . EXIT";
-    gotoxy(44, 22);
-    int ch;
-    cout << "Enter your choice: ";
-    cin >> ch;
-    string str;
-    string startID;
-    string result;
-    metrostation var;
-    double amount;
-    string searchId;
-    int index,sindex;
-    vector<Card> cards;
-    cards.push_back(Card("card1", 10.0));
-    cards.push_back(Card("card2", 20.0));
-    cards.push_back(Card("card3", 30.0));
-    cards.push_back(Card("card4", 40.0));
+vector<metrostation> stations;
+vector<vector<pair<int, int>>> eulerAdj(N);
+int dist[N][N];
+int nextNode[N][N];
+vector<int> eulerianPath;
 
-    switch (ch) {
-    case 1:
-        metromap();
-        break;
+void addEdge(int u, int v, int w) {
+    stations[u].addNeighbor(v, w);
+    stations[v].addNeighbor(u, w);
+    eulerAdj[u].emplace_back(v, w);
+    eulerAdj[v].emplace_back(u, w);
+}
 
-    case 2:
-        system("cls");
-        var.displaystation(station);
-        do {
-            cout <<"Enter station id you want to see information of: ";
-            cin >> str;
-            str=toUpperCase(str);
-            sindex = var.stationcheck(station, str);
-            if (sindex == -1) {
-                cout << "Invalid Station ID! Please enter a valid station ID.\n";
-            }
-        } while (sindex == -1);  // Keep asking if card ID is invalid
-          // Store the current station in the stack before updating
-    currentStation = str;
-    if (!currentStation.empty()) {
-        stationStack.push(currentStation);  // Push the current station onto the stack only if it's not empty
+void floydWarshall() {
+    for (int i = 0; i < N; i++)
+        for (int j = 0; j < N; j++) {
+            dist[i][j] = (i == j) ? 0 : INF;
+            nextNode[i][j] = -1;
+        }
+
+    for (int u = 0; u < N; ++u)
+        for (auto& e : stations[u].getNeighbors()) {
+            int v = e.first;
+            int w = e.second;
+            dist[u][v] = w;
+            nextNode[u][v] = v;
+        }
+
+    for (int k = 0; k < N; ++k)
+        for (int i = 0; i < N; ++i)
+            for (int j = 0; j < N; ++j)
+                if (dist[i][k] != INF && dist[k][j] != INF && dist[i][k] + dist[k][j] < dist[i][j]) {
+                    dist[i][j] = dist[i][k] + dist[k][j];
+                    nextNode[i][j] = nextNode[i][k];
+                }
+}
+
+vector<int> getPath(int u, int v) {
+    if (nextNode[u][v] == -1) return {};
+    vector<int> path = {u};
+    while (u != v) {
+        u = nextNode[u][v];
+        path.push_back(u);
+    }
+    return path;
+}
+
+vector<int> findOddDegreeVertices() {
+    vector<int> odd;
+    for (int i = 0; i < N; ++i)
+        if (stations[i].getDegree() % 2 != 0)
+            odd.push_back(i);
+    return odd;
+}
+
+int minCostMatching(vector<int>& odd, int mask, unordered_map<int, int>& memo) {
+    if (mask == 0) return 0;
+    if (memo.count(mask)) return memo[mask];
+
+    int first = -1;
+    for (int i = 0; i < odd.size(); ++i) {
+        if (mask & (1 << i)) {
+            first = i;
+            break;
+        }
     }
 
-      // Update current station to the new one
-
-    // Display station information for the new station
-    var.stationinfo(station, currentStation);
-    break;
-    case 3:
-    system("cls"); // Clear the screen
-
-    do {
-        gotoxy(44, 10);
-        cout << "Enter your card ID: ";
-        cin >> searchId;
-
-        index = check(searchId); // Check for card ID validity
-
-        if (index == -1) {
-            gotoxy(44, 12); // Position for error message
-            cout << "Card not found! Please enter a valid card ID.";
-            Sleep(1000); // Wait 1 second for user to see the message
-            system("cls");
-
+    int minCost = INF;
+    for (int j = first + 1; j < odd.size(); ++j) {
+        if (mask & (1 << j)) {
+            int newMask = mask ^ (1 << first) ^ (1 << j);
+            int cost = dist[odd[first]][odd[j]] + minCostMatching(odd, newMask, memo);
+            minCost = min(minCost, cost);
         }
-    } while (index == -1); // Repeat until a valid card ID is entered
+    }
 
-    // If a valid card ID is entered, display card info
-    get_card_by_index(index).display_card_info();
-    break;
+    return memo[mask] = minCost;
+}
 
-    case 4:
-        system("cls");
-        do {
-
-            gotoxy(44, 10);
-            cout << "Enter your card ID: ";
-            cin >> searchId;
-            index = check(searchId);
-            if (index == -1) {
-                    gotoxy(44, 12);
-                cout << "Card not found! Please enter a valid card ID.\n";
-                Sleep(1000); // Wait 1 second for user to see the message
-            system("cls");
-
+int totalOriginalCost() {
+    int total = 0;
+    vector<vector<bool>> visited(N, vector<bool>(N, false));
+    for (int u = 0; u < N; ++u) {
+        for (auto& e : stations[u].getNeighbors()) {
+            int v = e.first;
+            if (!visited[u][v]) {
+                total += e.second;
+                visited[u][v] = visited[v][u] = true;
             }
-        } while (index == -1);
-         gotoxy(44, 10);
-        cout << "Enter the amount to recharge: ";
-        cin >> amount;
-        get_card_by_index(index).recharge_card(amount);
-        break;
+        }
+    }
+    return total;
+}
 
-    case 5:
+void dfsEuler(int u) {
+    while (!eulerAdj[u].empty()) {
+        auto edge = eulerAdj[u].back();
+        eulerAdj[u].pop_back();
+        int v = edge.first;
+
+        auto& nbr = eulerAdj[v];
+        for (auto it = nbr.begin(); it != nbr.end(); ++it) {
+            if (it->first == u) {
+                nbr.erase(it);
+                break;
+            }
+        }
+
+        dfsEuler(v);
+    }
+    eulerianPath.push_back(u);
+}
+
+void prepareStations() {
+    stations.clear();  // ← This is crucial to avoid adding duplicate stations and edges!
+
+    vector<string> names = {
+        "Noida Electronic City", "Noida Sector 62", "Noida Sector 52", "Noida City Center",
+        "Botanical Garden", "Golf Course", "Noida Sector 18", "Akshardham", "Yamuna Bank",
+        "Indraprastha", "Mandi House", "Barakhamba Road", "Rajiv Chowk", "Karol Bagh",
+        "Patel Nagar", "ITO", "Delhi Gate", "Jama Masjid", "Lal Quila", "Kashmere Gate",
+        "Civil Lines", "GTB Nagar", "New Delhi", "Chawri Bazar", "Chandni Chowk"
+    };
+
+    for (int i = 0; i < names.size(); ++i) {
+        string id = "S" + to_string(i);
+        stations.emplace_back(id, names[i], "Blue", true, (i % 2 == 0), i);
+    }
+
+    // Now you can safely call addEdge, because stations are clean.
+    addEdge(0, 1, 4); addEdge(1, 2, 6); addEdge(2, 3, 1); addEdge(3, 4, 2);
+    addEdge(4, 5, 8); addEdge(5, 6, 5); addEdge(6, 7, 8); addEdge(7, 8, 6);
+    addEdge(8, 9, 3); addEdge(9, 10, 6); addEdge(10, 11, 6); addEdge(10, 15, 7);
+    addEdge(11, 12, 7); addEdge(12, 13, 4); addEdge(12, 22, 8); addEdge(13, 14, 6);
+    addEdge(15, 16, 7); addEdge(16, 17, 8); addEdge(17, 18, 3); addEdge(18, 19, 8);
+    addEdge(19, 24, 4); addEdge(19, 20, 6); addEdge(20, 21, 7); addEdge(22, 23, 5); addEdge(23, 24, 8);
+}
+
+
+void patrol_route() {
+    // Reset global or static structures
     system("cls");
-        do {
+    eulerianPath.clear();
+    eulerAdj.assign(N, vector<pair<int, int>>());  // or your graph size
+    unordered_map<int, int> memo;
 
-            gotoxy(44, 10);
-            cout << "Enter your card ID: ";
-            cin >> searchId;
-            index = check(searchId);
-            if (index == -1) {
-                    gotoxy(44, 12);
+    prepareStations();
+    floydWarshall();
 
-                cout << "Card not found! Please enter a valid card ID.\n";
-                 Sleep(1000); // Wait 1 second for user to see the message
-            system("cls");
+    int originalCost = totalOriginalCost();
+    vector<int> odd = findOddDegreeVertices();
+    int mask = (1 << odd.size()) - 1;
+    int extraCost = minCostMatching(odd, mask, memo);
+    int totalCPPcost = originalCost + extraCost;
 
+    // Add duplicate edges to make graph Eulerian
+    mask = (1 << odd.size()) - 1;
+    while (mask) {
+        int i = 0;
+        while (!(mask & (1 << i))) ++i;
+        int u = odd[i];
+        for (int j = i + 1; j < odd.size(); ++j) {
+            if (!(mask & (1 << j))) continue;
+            int v = odd[j];
+            int newMask = mask ^ (1 << i) ^ (1 << j);
+            int pairCost = dist[u][v];
+            if (extraCost == pairCost + minCostMatching(odd, newMask, memo)) {
+                vector<int> path = getPath(u, v);
+                for (int k = 0; k + 1 < path.size(); ++k) {
+                    eulerAdj[path[k]].emplace_back(path[k + 1], 0);
+                    eulerAdj[path[k + 1]].emplace_back(path[k], 0);
+                }
+                mask = newMask;
+                extraCost -= pairCost;
+                break;
             }
-        } while (index == -1);
-        double fare;
-        gotoxy(44, 12);
-        cout << "Enter the fare amount: ";
-        cin >> fare;
-        get_card_by_index(index).pay_fare(fare);
-        break;
-    case 6:
-
-        if (!stationStack.isEmpty()) {
-            currentStation = stationStack.peek();  // Retrieve the previous station ID
-            cout << "Going back to previous station: " << currentStation << endl;
-            stationStack.pop();  // Remove the previous station from the stack
-            var.stationinfo(station, currentStation);  // Show the details of the previous station
-        } else {
-            cout << "No previous station to go back to." << endl;
-            gotoxy(84, 30);
-            cout << "Press any key to go back to menu()........";
-            getch();
-            system("cls");
-            menu(station);
         }
-        break;
+    }
 
-    case 7:
+    dfsEuler(0);
+    reverse(eulerianPath.begin(), eulerianPath.end());
+
+    cout << "\n========== METRO PATROL ROUTE SOLUTION ==========\n";
+    cout << "\nTotal cost of existing metro routes: " << originalCost;
+    cout << "\nAdditional distance to ensure all routes are covered in a circuit: " << memo[(1 << odd.size()) - 1];
+    cout << "\n-------------------------------------------------";
+    cout << "\nTotal distance of optimized patrol route: " << totalCPPcost;
+
+    cout << "\n\nOptimized Patrol Route (covers all tracks at least once):\n";
+    for (int i = 0; i < eulerianPath.size(); ++i) {
+        cout << stations[eulerianPath[i]].getStation_name();
+        if (i != eulerianPath.size() - 1) cout << " -> ";
+    }
+
+    cout << "\n\nTotal stations visited (with revisits): " << eulerianPath.size();
+    cout << "\n=================================================\n";
+
+}
+
+void clean_metro_tracks() {
+    // Reset global or static structures
+    system("cls");
+    eulerianPath.clear();
+    eulerAdj.assign(N, vector<pair<int, int>>());  // or your graph size
+    unordered_map<int, int> memo;
+
+    prepareStations();
+    floydWarshall();
+
+    int originalCost = totalOriginalCost();
+    vector<int> odd = findOddDegreeVertices();
+    int mask = (1 << odd.size()) - 1;
+    int extraCost = minCostMatching(odd, mask, memo);
+    int totalCPPcost = originalCost + extraCost;
+
+    // Add duplicate edges to make graph Eulerian
+    mask = (1 << odd.size()) - 1;
+    while (mask) {
+        int i = 0;
+        while (!(mask & (1 << i))) ++i;
+        int u = odd[i];
+        for (int j = i + 1; j < odd.size(); ++j) {
+            if (!(mask & (1 << j))) continue;
+            int v = odd[j];
+            int newMask = mask ^ (1 << i) ^ (1 << j);
+            int pairCost = dist[u][v];
+            if (extraCost == pairCost + minCostMatching(odd, newMask, memo)) {
+                vector<int> path = getPath(u, v);
+                for (int k = 0; k + 1 < path.size(); ++k) {
+                    eulerAdj[path[k]].emplace_back(path[k + 1], 0);
+                    eulerAdj[path[k + 1]].emplace_back(path[k], 0);
+                }
+                mask = newMask;
+                extraCost -= pairCost;
+                break;
+            }
+        }
+    }
+
+    dfsEuler(0);
+    reverse(eulerianPath.begin(), eulerianPath.end());
+
+    cout << "\n========== CLEAN METRO TRACKS ROUTE SOLUTION ==========\n";
+    cout << "\nTotal cost of existing metro tracks: " << originalCost;
+    cout << "\nAdditional distance to ensure all tracks are cleaned in a circuit: " << memo[(1 << odd.size()) - 1];
+    cout << "\n--------------------------------------------------------";
+    cout << "\nTotal distance of optimized cleaning route: " << totalCPPcost;
+
+    cout << "\n\nOptimized Cleaning Route (covers all tracks at least once):\n";
+    for (int i = 0; i < eulerianPath.size(); ++i) {
+        cout << stations[eulerianPath[i]].getStation_name();
+        if (i != eulerianPath.size() - 1) cout << " -> ";
+    }
+
+    cout << "\n\nTotal stations visited (with revisits): " << eulerianPath.size();
+    cout << "\n========================================================\n";
+
+
+}
+
+
+void mainMenu(vector<metrostation> station) {
+  int userType;
+  while (true) {
+      system("cls");
+      gotoxy(50, 10);
+      cout << "[1]. User";
+      gotoxy(50, 11);
+      cout << "[2]. Staff";
+      gotoxy(50, 12);
+      cout << "[3]. Exit";
+      gotoxy(50, 14);
+      cout << "Enter your choice: ";
+      cin >> userType;
+        system("cls");
+      switch (userType) {
+          case 1: // User
+              int userChoice;
+
+              gotoxy(50, 15);  // Horizontal alignment at 40 and vertical spacing at 20
+        cout << "1. Login";
+        gotoxy(50, 17);
+        cout << "2. Signup";
+        gotoxy(50, 19);
+        cout << "Enter your choice: ";
+        cin >> userChoice;
+              if (userChoice == 1) {
+                  userLogin(); // Call user login function
+              } else if (userChoice == 2) {
+                  system("cls");
+                  userSignup(); // Call user signup function
+              } else {
+
+                  cout << "Invalid choice! Please try again.\n";
+              Sleep(1000);
+
+
+              }
+              break;
+          case 2: // Staff
+              int staffChoice;
+              gotoxy(50, 15);
+              cout << "1. Login";
+        gotoxy(50, 17);
+        cout << "2. Signup";
+        gotoxy(50, 19);
+        cout << "Enter your choice: ";
+              cin >> staffChoice;
+              if (staffChoice == 1) {
+
+                  staffLogin(); // Call staff login function
+              } else if (staffChoice == 2) {
+                  system("cls");
+                  staffSignup(); // Call staff signup function
+              } else {
+                  cout << "Invalid choice! Please try again.\n";
+              Sleep(1000);
+              }
+              break;
+          case 3:
+              cout << "\nExiting the program. Goodbye!\n";
+              exit(0);
+          default:
+              cout << "Invalid choice! Please try again.\n";
+              Sleep(1000);
+              mainMenu(station);
+
+      }
+  }
+}
+//--------------------------------------------------------------------------------------
+
+void userMenu(vector<metrostation> station) {
+    static Stack stationStack;
+    static string currentStation = "";
+    metrostation var;
+    vector<Card> cards = {
+        Card("card1", 10.0), Card("card2", 20.0),
+        Card("card3", 30.0), Card("card4", 40.0)
+    };
+    int ch;
+    string str, startID, searchId, result;
+    double amount, fare;
+    int index, sindex;
+
+    while (true) {
+        system("cls");
+        gotoxy(44, 10);
+        cout << "[1]. Show Metro Map";
+        gotoxy(44, 11);
+        cout << "[2]. Show station details";
+        gotoxy(44, 12);
+        cout << "[3]. Display Card Info";
+        gotoxy(44, 13);
+        cout << "[4]. Recharge Card";
+        gotoxy(44, 14);
+        cout << "[5]. Pay Fare";
+        gotoxy(44, 15);
+        cout << "[6]. Go back to previous station";
+        gotoxy(44, 16);
+        cout << "[7]. Nearest station with Washroom";
+        gotoxy(44, 17);
+        cout << "[8]. Nearest station with Parking";
+        gotoxy(44, 18);
+        cout << "[9]. All paths between two stations";
+        gotoxy(44, 19);
+        cout << "[10]. Shortest path between two stations";
+        gotoxy(44, 20);
+        cout << "[11]. Go to main menu";
+        gotoxy(44, 22);
+        cout << "Enter your choice: ";
+        cin >> ch;
+
+        switch (ch) {
+            case 1:
+                metromap(); break;
+            case 2:
+                system("cls");
+                var.displaystation(station);
+                do {
+                    cout << "Enter station id: ";
+                    cin >> str;
+                    str = toUpperCase(str);
+                    sindex = var.stationcheck(station, str);
+                    if (sindex == -1) cout << "Invalid Station ID!\n";
+                } while (sindex == -1);
+                currentStation = str;
+                if (!currentStation.empty()) stationStack.push(currentStation);
+                var.stationinfo(station, currentStation);
+                break;
+            case 3:
+                system("cls");
+                do {
+                    gotoxy(44, 10);
+                    cout << "Enter your card ID: ";
+                    cin >> searchId;
+                    index = check(searchId);
+                    if (index == -1) {
+                        cout << "Card not found!\n";
+                        Sleep(1000); system("cls");
+                    }
+                } while (index == -1);
+                get_card_by_index(index).display_card_info();
+                break;
+            case 4:
+                system("cls");
+                do {
+                    gotoxy(44, 10);
+                    cout << "Enter your card ID: ";
+                    cin >> searchId;
+                    index = check(searchId);
+                    if (index == -1) {
+                        cout << "Card not found!\n";
+                        Sleep(1000); system("cls");
+                    }
+                } while (index == -1);
+                gotoxy(44, 10);
+                cout << "Enter amount to recharge: ";
+                cin >> amount;
+                get_card_by_index(index).recharge_card(amount);
+                break;
+            case 5:
+                system("cls");
+                do {
+                    gotoxy(44, 10);
+                    cout << "Enter your card ID: ";
+                    cin >> searchId;
+                    index = check(searchId);
+                    if (index == -1) {
+                        cout << "Card not found!\n";
+                        Sleep(1000); system("cls");
+                    }
+                } while (index == -1);
+                gotoxy(44, 12);
+                cout << "Enter fare: ";
+                cin >> fare;
+                get_card_by_index(index).pay_fare(fare);
+                break;
+            case 6:
+                system("cls");
+                if (!stationStack.isEmpty()) {
+                    currentStation = stationStack.peek();
+                    stationStack.pop();
+                    cout << "Returning to: " << currentStation << "\n";
+                    var.stationinfo(station, currentStation);
+                } else {
+                    cout << "No previous station.\n";
+                }
+                break;
+            case 7:
             system("cls");
             gotoxy(5,2);
             design(120,177);
@@ -1063,7 +1511,7 @@ void menu(vector<metrostation>station)
                 cout<<"Press any key to go back to menu()........";
                 getch();
                 system("cls");
-                menu(station);
+                userMenu(station);;
             break;
     case 8:
     system("cls");
@@ -1084,103 +1532,96 @@ void menu(vector<metrostation>station)
     cout<<"Press any key to go back to menu()........";
     getch();
     system("cls");
-    menu(station);
+    userMenu(station);
             break;
-
-    case 9:{
-        // New functionality for finding all paths between two stations
-        int source, destination;
-        system("cls");
-        var.displaystation(station);
-        do{
-
-        cout << "Enter source station number: ";
-        cin >> source;
-        source--;
-        cout << "Enter destination station number: ";
-        cin >> destination;
-        destination--;
-        if(source < 0 || source > 24) cout<<"Please enter source according to the display ."<<endl;
-        if(destination < 0 || destination > 24)  cout<<"Please enter destination according to the display ."<<endl;
-        } while(source < 0 || source > 24 || destination < 0 || destination > 24 );
-
-
-        vector<vector<int>> paths = findAllPaths(source, destination, station);
-        cout << "All Paths from " << station[source].getStation_name() << " to " << station[destination].getStation_name() << ":\n\n\n";
-
-        int pathNumber = 1;
-
-        for (const auto &path : paths) {
-            cout << "Path " << pathNumber++ << " :  ";
-
-            for (int stationidx : path) {
-                cout << station[stationidx].getStation_name();
-
-                if (stationidx != destination) {
-                    cout << "  ->  ";  // Add arrow between station names, except after the last one
-                }
-            }
-            cout << endl<<endl;
-        }
-
-        cout << "Press any key to go back to menu()........";
-        getch();
-        system("cls");
-        menu(station);
-        break;
-    }
-
-    case 10: {
+            case 9: {
                 int source, destination;
                 system("cls");
                 var.displaystation(station);
-                 do{
-                cout << "Enter source station number: ";
-                cin >> source;
-                source--;
-                cout << "Enter destination station number: ";
-                cin >> destination;
-                destination--;
-                if(source < 0 || source > 24) cout<<"Please enter source according to the display ."<<endl;
-                if(destination < 0 || destination > 24)  cout<<"Please enter destination according to the display ."<<endl;
-                } while(source < 0 || source > 24 || destination < 0 || destination > 24 );
-
-                // Get the shortest path from start to end
-                pair<vector<string>, int> result = findShortestPath(station, source, destination);
+                do {
+                    cout << "Enter source station number: ";
+                    cin >> source;
+                    source--;
+                    cout << "Enter destination station number: ";
+                     cin >> destination;
+                     destination--;
+                     if(source < 0 || source > 24) cout<<"Please enter source according to the display ."<<endl;
+        if(destination < 0 || destination > 24)  cout<<"Please enter destination according to the display ."<<endl;
+                } while (source < 0 || destination < 0 || source > 24 || destination > 24);
+                vector<vector<int>> paths = findAllPaths(source, destination, station);
+                int pno = 1;
+                for (auto path : paths) {
+                    cout << "Path " << pno++ << ": ";
+                    for (int idx : path) {
+                        cout << station[idx].getStation_name();
+                        if (idx != destination) cout << " -> ";
+                    }
+                    cout << "\n";
+                }
+                break;
+            }
+            case 10: {
+                int source, destination;
+                system("cls");
+                var.displaystation(station);
+                do {
+                    cout << "Enter source station number: "; cin >> source; source--;
+                    cout << "Enter destination station number: "; cin >> destination; destination--;
+                } while (source < 0 || destination < 0 || source > 24 || destination > 24);
+                auto result = findShortestPath(station, source, destination);
                 vector<string> path = result.first;
                 int distance = result.second;
-
-                    cout << "\nThe shortest distance from station " << station[source].getStation_name()
-                         << " to station " << station[destination].getStation_name() << " is: " << distance << " km\n";
-                    cout << "\nStations crossed: \n\n";
-
-                    int arrows=path.size()-1;
-                    for (const auto& stationName : path) {
-                        cout << stationName << "  ";
-
-                        if(arrows--) cout<<"  ->  ";
-                    }
-                    cout << "\n\n";
-
-                    cout << "Press any key to go back to menu()........";
-                    getch();
-                    system("cls");
-                    menu(station);
-                    break;
-
+                cout << "Shortest Distance: " << distance << " km\n";
+                for (int i = 0; i < path.size(); ++i) {
+                    cout << path[i];
+                    if (i != path.size() - 1) cout << " -> ";
+                }
+                cout << "\n";
+                break;
             }
-
-
-    case 11:
-        cout << "\nExiting the program. Goodbye!\n";
-        exit(0);  // Close the program
-        break;
-
-    default:
-        cout << "Invalid choice! Please try again.\n";
-        break;
+            case 11:
+                mainMenu(station);
+                break;
+            default:
+                cout << "Invalid choice!\n";
+        }
+        cout << "\nPress any key to continue...\n";
+        getch();
+    }
 }
+//-------------------------------------------------------------------------------------------------
+
+void staffMenu(vector<metrostation> station) {
+    int choice;
+    while (true) {
+        system("cls");
+        gotoxy(50, 10);
+        cout << "[1]. Patrol Route";
+        gotoxy(50, 11);
+        cout << "[2]. Route Cleaning";
+        gotoxy(50, 12);
+        cout << "[3]. Return to Main Menu";
+        gotoxy(50, 14);
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                patrol_route();
+                break;
+            case 2:
+                clean_metro_tracks();
+                break;
+            case 3:
+                return;
+            default:
+                cout << "Invalid option!\n";
+        }
+        cout << "\nPress any key to continue...\n";
+        getch();
+    }
 }
+
 int main()
 {
     initstations();
@@ -1192,58 +1633,26 @@ int main()
     cout << "METRO SYSTEM NOIDA";
 gotoxy(1,4);
     design(130,177);
-    gotoxy(20, 5);
 
-    gotoxy(10, 7);
-    cout << "Welcome aboard the future of urban mobility! Step into the dynamic world of the Noida Metro System, where seamless journeys and efficient";
-    gotoxy(10, 9);
-    cout << "connections await you. Explore the heart of Noida with our state-of-the-art metro network, designed to make your daily commute a breeze and your";
 
-    gotoxy(10, 11);
-    cout << "city adventures unforgettable. Whether you're a resident or a visitor, the Noida Metro is your key to unlocking the vibrant energy of this";
 
-    gotoxy(10, 13);
-    cout << "thriving city. Discover the beauty, culture, and convenience of Noida like never before as you embark on a remarkable metro experience. Fasten";
 
-    gotoxy(10, 15);
-    cout << "your seatbelts, and let's ride the future together!";
+gotoxy(10, 7);
+cout << "\t\tStep aboard the future of urban transportation!\n Experience a smarter, greener, and faster way to explore the vibrant city of Noida. Our state-of-the-art metro simulation brings to life the pulse of the city connecting people, places, and possibilities seamlessly. Whether you're a local commuter or a \ncurious traveler,the Noida Metro ensures your journey is efficient, safe, and unforgettable.";
 
-    // Adding space between the text and menu
-    gotoxy(10, 17);
-    cout << " ";
+gotoxy(10, 14);
+cout << "Brought to you with  love, logic, and a lot of caffeine by:";
 
-    int choice;
-    bool running = true;
-    string str;
-    while (running) {
+gotoxy(10, 15);
+cout << " Shubhra    Akshat    Janvi    Jitendra";
 
-gotoxy(40, 20);  // Horizontal alignment at 40 and vertical spacing at 20
-        cout << "1. Login";
+gotoxy(10, 19);
+cout << "============================================================";
+gotoxy(10, 20);
+cout << "        Press any key to begin your metro adventure...";
 
-        gotoxy(40, 22);
-        cout << "2. Signup";
+getch(); // Wait for a key press
+mainMenu(station);
+return 0;
 
-        gotoxy(40, 24);
-        cout << "3. Exit";
-
-        gotoxy(40, 26);
-        cout << "Enter your choice: ";
-        cin >> choice;
-        switch (choice) {
-            case 1:
-                login();
-                break;
-            case 2:
-                system("cls");
-                signup();
-                break;
-            case 3:
-                cout << "\nExiting the program. Goodbye!\n";
-                running = false; // Exit the loop
-                break;
-            default:
-                cout << "Invalid choice! Please try again.\n";
-        }
-    }
-    return 0;
 }
