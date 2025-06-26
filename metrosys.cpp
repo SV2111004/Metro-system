@@ -1638,7 +1638,7 @@ gotoxy(1,4);
 
 
 gotoxy(10, 7);
-cout << "\t\tStep aboard the future of urban transportation!\n Experience a smarter, greener, and faster way to explore the vibrant city of Noida. Our state-of-the-art metro simulation brings to life the pulse of the city connecting people, places, and possibilities seamlessly. Whether you're a local commuter or a \ncurious traveler,the Noida Metro ensures your journey is efficient, safe, and unforgettable.";
+cout << "\t\tWelcome to the future of urban commuting!\n Discover a smarter, eco-friendly, and faster way to experience the dynamic city of Noida. Our advanced metro simulation captures the heartbeat of the city—connecting people, destinations, and opportunities effortlessly. Whether you're a daily rider or an explorer at heart, Noida Metro promises a journey that's safe, efficient, and truly memorable.";
 
 gotoxy(10, 14);
 cout << "Brought to you with  love, logic, and a lot of caffeine by:";
