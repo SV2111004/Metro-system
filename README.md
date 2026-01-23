@@ -67,10 +67,10 @@ The project is divided into two user modes — **User** and **Staff** — each o
 
 | Name | GitHub Profile | Primary Responsibilities | Supported In |
 |------|----------------|--------------------------|---------------|
-|  **Shubhra Varshney** |  [@SV2111004](https://github.com/SV2111004) | 🔹 Implemented **Dijkstra's Algorithm** for shortest path<br>🔹 Designed and managed **station data structures** and **station info display** | ➕ Assisted **Jitendra** in integrating shortest path logic into **patrol route planning** |
-|  **Akshat** | [@Akshat-1618](https://github.com/Akshat-1618) | 🔹 Implemented **All Paths feature** using DFS/BFS<br>🔹 Designed **user movement tracking** for going back to previous station | ➕ Helped **Janvi** in connecting travel actions with **fare deduction logic** |
-|  **Janvi** |[@JanviArora24](https://github.com/JanviArora24) | 🔹 Developed **nearest washroom/parking station** finder using Priority Queue<br>🔹 Handled **login/signup system** and **metro card recharge/deduction** | ➕ Coordinated with **Akshat** for **card balance tracking** after station movement |
-|  **Jitendra** | [@Jitendra-roy04](https://github.com/Jitendra-roy04) | 🔹 Implemented **Eulerian Circuit** algorithm (Fleury’s) for **maintenance/patrol routes**<br>🔹 Built and maintained the **metro graph structure** with edge weights | ➕ Worked with **Shubhra** to unify **shortest path** and **maintenance logic** |
+|  **Shubhra Varshney** |  [@Shubhra](https://github.com/SV2111004) | 🔹 Implemented **Dijkstra's Algorithm** for shortest path<br>🔹 Designed and managed **station data structures** and **station info display** | ➕ Assisted **Jitendra** in integrating shortest path logic into **patrol route planning** |
+|  **Akshat** | [@Akshat](https://github.com/Akshat-1618) | 🔹 Implemented **All Paths feature** using DFS/BFS<br>🔹 Designed **user movement tracking** for going back to previous station | ➕ Helped **Janvi** in connecting travel actions with **fare deduction logic** |
+|  **Janvi** |[@Janvi](https://github.com/JanviArora24) | 🔹 Developed **nearest washroom/parking station** finder using Priority Queue<br>🔹 Handled **login/signup system** and **metro card recharge/deduction** | ➕ Coordinated with **Akshat** for **card balance tracking** after station movement |
+|  **Jitendra** | [@Jitendra](https://github.com/Jitendra-roy04) | 🔹 Implemented **Eulerian Circuit** algorithm (Fleury’s) for **maintenance/patrol routes**<br>🔹 Built and maintained the **metro graph structure** with edge weights | ➕ Worked with **Shubhra** to unify **shortest path** and **maintenance logic** |
 
 ---
 
